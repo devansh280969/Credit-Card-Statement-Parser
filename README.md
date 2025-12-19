@@ -1,78 +1,80 @@
-Credit Card Statement Parser
-Overview
+# Credit Card Statement Parser
 
-This project parses credit card PDF statements from multiple Indian banks and extracts key information in a standardized JSON format.
-It is designed to handle real-world, messy PDFs using a mix of generic parsing and bank-specific overrides.
+## Overview
+This project is a **Python-based PDF parser** that extracts key information from **credit card statements** issued by multiple banks.  
+It is designed to handle **real-world statement formats**, which often vary across banks and contain inconsistent layouts.
 
-Supported Banks
+The parser outputs a **standardized JSON structure**, regardless of the bank.
 
-Axis Bank
+---
 
-ICICI Bank
+## Supported Banks
+- Axis Bank  
+- ICICI Bank  
+- HDFC Bank  
+- IDFC First Bank  
+- Citibank  
 
-HDFC Bank
+---
 
-IDFC First Bank
+## Extracted Data Points
+For each credit card statement, the parser extracts:
 
-Citibank
+- **Bank Name**
+- **Card Last 4 Digits**
+- **Statement Period** (From → To)
+- **Total Amount Due**
+- **Payment Due Date**
+- **Transaction Count**
 
-Data Points Extracted
+---
 
-For each statement, the parser extracts:
+## Project Structure
 
-Bank Name
+```markdown
+credit-card-statement-parser/
+├── data/               # Sample credit card PDFs
+├── detector/           # Bank issuer detection
+├── extractor/          # PDF text extraction logic
+├── parsers/            # Bank-specific parsers
+├── utils/              # Regex helpers & bank overrides
+├── constants.py        # Global constants
+├── main.py             # Application entry point
+├── requirements.txt    # Project dependencies
+└── README.md           # Documentation
+```
 
-Card Last 4 Digits
+---
 
-Statement Period (from → to)
+## How It Works
 
-Total Amount Due
+### 1. PDF Text Extraction
+- Uses **pdfplumber** to extract text from digital PDFs.
+- Uses **pikepdf** to handle password-protected statements.
 
-Payment Due Date
+### 2. Bank Detection
+- Identifies the issuing bank using unique keywords present in the statement text.
 
-Transaction Count
+### 3. Parsing Logic
+- Routes the extracted text to the appropriate **bank-specific parser**.
+- Uses **generic parsing rules** where possible.
+- Applies **bank-specific overrides** to handle layout inconsistencies.
 
-Project Structure
-credit_card_statement_parser/
-├── data/                  # Sample PDF statements
-├── detector/              # Bank issuer detection
-├── extractor/             # PDF text extraction
-├── parsers/               # Bank-specific parsers
-├── utils/                 # Regex & bank overrides
-├── constants.py
-├── main.py
-├── requirements.txt
-└── README.md
+### 4. Standardized Output
+- Produces a consistent output structure for all supported banks.
 
-How It Works
+---
 
-PDF Text Extraction
-Uses pdfplumber (and pikepdf for locked PDFs) to extract raw text.
+## How to Run
 
-Issuer Detection
-Identifies the bank based on unique keywords in the statement.
-
-Bank-Specific Parsing
-Routes the text to the appropriate bank parser with overrides for edge cases.
-
-Standardized Output
-Returns a clean Python dictionary with consistent fields across all banks.
-
-How to Run
-
-Install dependencies:
-
+### Install Dependencies
+```bash
 pip install -r requirements.txt
-
-
-Run the parser:
-
 python main.py
+```
 
-
-Update the PDF path in main.py to test different statements.
-
-Sample Output
+### Sample Output
+```json
 {
   "bank_name": "AXIS",
   "card_last_4": "7381",
@@ -84,31 +86,29 @@ Sample Output
   "payment_due_date": "04/11/2021",
   "transaction_count": 54
 }
+```
 
-Design Decisions
+## Design Decisions
+- **Rule-based parsing** was chosen for deterministic fields (dates, amounts, card numbers) to ensure accuracy, transparency, and debuggability.
+- A **modular parser architecture** was implemented, with a base parser and bank-specific overrides, to cleanly handle layout differences across issuers.
+- **Bank detection is performed upfront**, allowing automatic routing of statements to the correct parser without manual configuration.
+- **Generic logic is reused wherever possible**, with overrides added only when a bank’s format deviates significantly (e.g., Citi transaction dates).
+- OCR and AI/LLM approaches were **intentionally avoided** because the statements are digital PDFs; deterministic parsing is more reliable and auditable.
+- The system prioritizes **correctness and maintainability** over over-engineering, making it easy to extend support for additional banks in the future.
 
-Rule-based parsing for deterministic fields (dates, amounts).
+## Limitations
+- **OCR is not supported**; the parser does not handle scanned or image-only PDF statements.
+- Statement parsing may break if banks **significantly redesign their statement layouts**.
+- Transaction extraction is **count-based only** and does not return detailed line-item transaction data.
+- The parser assumes **English-language statements** and may not work correctly for other languages.
+- Password-protected PDFs are supported only when the correct password is provided.
 
-Bank-specific overrides for layout inconsistencies.
+## Future Improvements
+- Add OCR support (e.g., Tesseract) to handle scanned or image-based PDF statements.
+- Extract full transaction tables with structured line-item data instead of only transaction counts.
+- Introduce schema validation using Pydantic to enforce consistent and type-safe outputs.
+- Add an optional AI/LLM-based fallback for highly irregular or previously unseen statement formats.
+- Expose the parser through a REST API (e.g., FastAPI) for easier integration into other systems.
+- Improve error handling and logging for better observability in production environments.
 
-Avoided OCR/ML since statements are digital PDFs.
 
-Focused on correctness and explainability over over-engineering.
-
-Limitations
-
-OCR is not supported (scanned PDFs not handled).
-
-Formats may change if banks redesign statement layouts.
-
-Transaction parsing is count-based, not line-item extraction.
-
-Future Improvements
-
-OCR support for scanned statements
-
-Full transaction table extraction
-
-Schema validation using Pydantic
-
-API wrapper for production use
