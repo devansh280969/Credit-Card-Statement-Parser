@@ -105,7 +105,7 @@ c="data/CITIBANK.pdf"
 h="data/HDFC.pdf"       
 ic="data/ICICI_1.pdf"  
 id="data/IDFC.pdf"      
-text = extract_text(h)
+text = extract_text(a)# Replace with a for Axis, C for Citi, H for HDFC, ic for ICICI and id for IDFC
 
 issuer = detect_issuer(text)
 parser = get_parser(issuer)
