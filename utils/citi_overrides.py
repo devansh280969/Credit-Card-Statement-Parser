@@ -4,12 +4,6 @@ import re
 
 
 def extract_due_date_citi(text: str):
-    """
-    FINAL CITI RULE (guaranteed for this PDF):
-    - Extract ALL DD/MM/YY or DD/MM/YYYY dates
-    - First date  = Statement Date
-    - Second date = Payment Due Date
-    """
 
     dates = re.findall(
         r"\b\d{2}/\d{2}/\d{2,4}\b",

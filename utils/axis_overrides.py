@@ -2,11 +2,8 @@ import re
 
 def extract_due_date_axis(text: str):
     """
-    FINAL AXIS LOGIC:
-    - Find 'Payment Summary' header row
-    - Read the next line (values)
-    - Extract all DD/MM/YYYY dates
-    - Return the SECOND LAST date (Payment Due Date)
+    Extracts the payment due date from Axis Bank credit card statements
+    by locating the Payment Summary section and parsing the value row.
     """
 
     lines = [l.strip() for l in text.splitlines() if l.strip()]
@@ -30,7 +27,7 @@ def extract_due_date_axis(text: str):
                 # AXIS pattern:
                 # [statement_start, statement_end, payment_due_date, generation_date]
                 if len(dates) >= 3:
-                    return dates[-2]  # ← THIS IS THE FIX
+                    return dates[-2]
 
     return None
 
